@@ -4,8 +4,8 @@ const app = express();
 
 const mongoose = require('mongoose');
 
-const stuffRoutes = require('./routes/stuff');
-const userRoutes = require('./routes/User');
+const sauceRoutes = require('./routes/sauces');
+const userRoutes = require('./routes/user');
 const path = require('path');
 
 mongoose.connect('mongodb+srv://Julien:ReCv3fHF4NDlj5dW@cluster0.dcmatuh.mongodb.net/?retryWrites=true&w=majority',
@@ -25,7 +25,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/api/stuff', stuffRoutes);
+app.use('/api/sauces', sauceRoutes);
 app.use('/api/auth', userRoutes);
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
