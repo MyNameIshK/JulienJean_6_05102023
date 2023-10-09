@@ -65,7 +65,7 @@ exports.deleteSauce = (req, res, next) => {
                 const filename = sauce.imageUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
                     Sauce.deleteOne({ _id: req.params.id })
-                        .then(() => { res.status(200).json({ message: 'Sauce supprimée !' }) })
+                        .then(() => res.status(200).json({ message: 'Sauce supprimée !' }))
                         .catch(error => res.status(401).json({ error }));
                 });
             }
@@ -77,8 +77,8 @@ exports.deleteSauce = (req, res, next) => {
 
 exports.getAllSauces = (req, res, next) => {
     Sauce.find().then(
-        (Sauces) => {
-            res.status(200).json(Sauces);
+        (sauce) => {
+            res.status(200).json(sauce);
         }
     ).catch(
         (error) => {
@@ -87,4 +87,87 @@ exports.getAllSauces = (req, res, next) => {
             });
         }
     );
+};
+
+exports.likeDislike = (req, res, next) => {
+    const userId = req.auth.userId;
+    const like = req.body.like;
+
+    if (like === -1 || like === 0 || like === 1) {
+        const sauceId = req.params.id;
+        Sauce.findById(sauceId)
+            .then((sauce) => {
+                if (!sauce) {
+                    return res.status(404).json({ message: "Sauce non trouvée" });
+                }
+
+                const userLiked = sauce.usersLiked.includes(userId);
+                const userDisliked = sauce.usersDisliked.includes(userId);
+
+                if (like === 1 && !userLiked) {
+                    Sauce.updateOne(
+                        { _id: sauceId },
+                        {
+                            $inc: { likes: 1 },
+                            $push: { usersLiked: userId },
+                        }
+                    )
+                        .then(() => {
+                            res.status(200).json({ message: "Like ajouté avec succès" });
+                        })
+                        .catch((error) => {
+                            res.status(500).json({ error });
+                        });
+                } else if (like === -1 && !userDisliked) {
+                    Sauce.updateOne(
+                        { _id: sauceId },
+                        {
+                            $inc: { dislikes: 1 },
+                            $push: { usersDisliked: userId },
+                        }
+                    )
+                        .then(() => {
+                            res.status(200).json({ message: "Dislike ajouté avec succès" });
+                        })
+                        .catch((error) => {
+                            res.status(500).json({ error });
+                        });
+                } else if (like === 0) {
+                    if (userLiked) {
+                        Sauce.updateOne(
+                            { _id: sauceId },
+                            {
+                                $inc: { likes: -1 },
+                                $pull: { usersLiked: userId },
+                            }
+                        )
+                            .then(() => {
+                                res.status(200).json({ message: "Like annulé avec succès" });
+                            })
+                            .catch((error) => {
+                                res.status(500).json({ error });
+                            });
+                    } else if (userDisliked) {
+                        Sauce.updateOne(
+                            { _id: sauceId },
+                            {
+                                $inc: { dislikes: -1 },
+                                $pull: { usersDisliked: userId },
+                            }
+                        )
+                            .then(() => {
+                                res.status(200).json({ message: "Dislike annulé avec succès" });
+                            })
+                            .catch((error) => {
+                                res.status(500).json({ error });
+                            });
+                    }
+                }
+            })
+            .catch((error) => {
+                res.status(500).json({ error });
+            });
+    } else {
+        res.status(400).json({ message: "Valeur de like invalide" });
+    }
 };
