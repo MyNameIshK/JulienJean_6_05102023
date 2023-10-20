@@ -14,7 +14,7 @@ exports.createSauce = (req, res, next) => {
     });
 
     sauce.save()
-        .then(() => { res.status(201).json({ message: 'Sauce enregistrée !' }) })
+        .then(() => res.status(201).json({ message: 'Sauce enregistrée !' }))
         .catch(error => res.status(400).json({ error }));
 };
 
@@ -38,9 +38,7 @@ exports.modifySauce = (req, res, next) => {
                     .catch(error => res.status(401).json({ error }));
             }
         })
-        .catch((error) => {
-            res.status(400).json({ error });
-        });
+        .catch((error) => res.status(400).json({ error }));
 };
 
 exports.deleteSauce = (req, res, next) => {
@@ -57,7 +55,7 @@ exports.deleteSauce = (req, res, next) => {
                 });
             }
         })
-        .catch(error => { res.status(500).json({ error }); });
+        .catch(error => res.status(500).json({ error }));
 };
 
 exports.getAllSauces = (req, res, next) => {
