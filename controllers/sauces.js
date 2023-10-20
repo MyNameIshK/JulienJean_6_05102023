@@ -85,7 +85,7 @@ exports.likeDislike = (req, res, next) => {
                             $push: { usersLiked: userId },
                         }
                     )
-                        .then(() => { res.status(200).json({ message: "Like ajouté avec succès" }) })
+                        .then(() => res.status(200).json({ message: "Like ajouté avec succès" }))
                         .catch((error) => res.status(500).json({ error }));
                 } else if (like === -1 && !userDisliked) {
                     Sauce.updateOne(
@@ -95,7 +95,7 @@ exports.likeDislike = (req, res, next) => {
                             $push: { usersDisliked: userId },
                         }
                     )
-                        .then(() => { res.status(200).json({ message: "Dislike ajouté avec succès" }) })
+                        .then(() => res.status(200).json({ message: "Dislike ajouté avec succès" }))
                         .catch((error) => res.status(500).json({ error }));
                 } else if (like === 0) {
                     if (userLiked) {
@@ -106,7 +106,7 @@ exports.likeDislike = (req, res, next) => {
                                 $pull: { usersLiked: userId },
                             }
                         )
-                            .then(() => { res.status(200).json({ message: "Like annulé avec succès" }) })
+                            .then(() => res.status(200).json({ message: "Like annulé avec succès" }))
                             .catch((error) => res.status(500).json({ error }));
                     } else if (userDisliked) {
                         Sauce.updateOne(
@@ -116,7 +116,7 @@ exports.likeDislike = (req, res, next) => {
                                 $pull: { usersDisliked: userId },
                             }
                         )
-                            .then(() => { res.status(200).json({ message: "Dislike annulé avec succès" }) })
+                            .then(() => res.status(200).json({ message: "Dislike annulé avec succès" }))
                             .catch((error) => res.status(500).json({ error }));
                     }
                 }
