@@ -15,30 +15,17 @@ exports.createSauce = (req, res, next) => {
 
     sauce.save()
         .then(() => { res.status(201).json({ message: 'Sauce enregistrée !' }) })
-        .catch(error => { res.status(400).json({ error }) })
+        .catch(error => res.status(400).json({ error }));
 };
 
 exports.getOneSauce = (req, res, next) => {
-    Sauce.findOne({
-        _id: req.params.id
-    }).then(
-        (sauce) => {
-            res.status(200).json(sauce);
-        }
-    ).catch(
-        (error) => {
-            res.status(404).json({
-                error: error
-            });
-        }
-    );
+    Sauce.findOne({ _id: req.params.id })
+        .then((sauce) => res.status(200).json(sauce))
+        .catch((error) => res.status(404).json({ error: error }));
 };
 
 exports.modifySauce = (req, res, next) => {
-    const sauceObject = req.file ? {
-        ...JSON.parse(req.body.sauce),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    } : { ...req.body };
+    const sauceObject = req.file ? { ...JSON.parse(req.body.sauce), imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` } : { ...req.body };
 
     delete sauceObject._userId;
     Sauce.findOne({ _id: req.params.id })
@@ -70,23 +57,13 @@ exports.deleteSauce = (req, res, next) => {
                 });
             }
         })
-        .catch(error => {
-            res.status(500).json({ error });
-        });
+        .catch(error => { res.status(500).json({ error }); });
 };
 
 exports.getAllSauces = (req, res, next) => {
-    Sauce.find().then(
-        (sauce) => {
-            res.status(200).json(sauce);
-        }
-    ).catch(
-        (error) => {
-            res.status(400).json({
-                error: error
-            });
-        }
-    );
+    Sauce.find()
+        .then((sauce) => res.status(200).json(sauce))
+        .catch((error) => res.status(400).json({ error }));
 };
 
 exports.likeDislike = (req, res, next) => {
@@ -111,7 +88,7 @@ exports.likeDislike = (req, res, next) => {
                         }
                     )
                         .then(() => { res.status(200).json({ message: "Like ajouté avec succès" }) })
-                        .catch((error) => { res.status(500).json({ error }) });
+                        .catch((error) => res.status(500).json({ error }));
                 } else if (like === -1 && !userDisliked) {
                     Sauce.updateOne(
                         { _id: sauceId },
@@ -121,7 +98,7 @@ exports.likeDislike = (req, res, next) => {
                         }
                     )
                         .then(() => { res.status(200).json({ message: "Dislike ajouté avec succès" }) })
-                        .catch((error) => { res.status(500).json({ error }) });
+                        .catch((error) => res.status(500).json({ error }));
                 } else if (like === 0) {
                     if (userLiked) {
                         Sauce.updateOne(
@@ -132,7 +109,7 @@ exports.likeDislike = (req, res, next) => {
                             }
                         )
                             .then(() => { res.status(200).json({ message: "Like annulé avec succès" }) })
-                            .catch((error) => { res.status(500).json({ error }) });
+                            .catch((error) => res.status(500).json({ error }));
                     } else if (userDisliked) {
                         Sauce.updateOne(
                             { _id: sauceId },
@@ -142,10 +119,10 @@ exports.likeDislike = (req, res, next) => {
                             }
                         )
                             .then(() => { res.status(200).json({ message: "Dislike annulé avec succès" }) })
-                            .catch((error) => { res.status(500).json({ error }) });
+                            .catch((error) => res.status(500).json({ error }));
                     }
                 }
             })
-            .catch((error) => { res.status(500).json({ error }); });
+            .catch((error) => res.status(500).json({ error }));
     } else { res.status(400).json({ message: "Valeur de like invalide" }); }
 };
